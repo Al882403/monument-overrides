@@ -1,5 +1,5 @@
 /*Main Course App Controller*/
-alert("Hello!")
+alert("Hello55!")
 var app = (function () {
   var __moduleModel = null;
   var __startPageModel = {
