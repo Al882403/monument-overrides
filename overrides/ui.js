@@ -1,4 +1,5 @@
-alert(1)
+alert("HI")
+
 var UI = (function(){
   var EventManger = {
   };
