@@ -1,3 +1,4 @@
+alert("Works")
 var UI = (function(){
   var EventManger = {
   };
