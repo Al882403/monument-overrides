@@ -5,7 +5,8 @@
 // Such an event can be triggered by the extension to inject custom user-written JS.
 // Array that consists of ['filename', element] pairs.
 
-alert(1)
+
+alert("NICE")
 let added_js = [];
 // Create a DOM EventTarget object
 var target = document.createElement('span');
