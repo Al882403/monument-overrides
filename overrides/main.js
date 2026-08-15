@@ -54,9 +54,6 @@ var app = (function () {
           $(".lms-error-message").addClass("show");
         }
       }
-      __scormBridge.set(__scormBridge.KEYS.LessonStatus,"completed");
-      __scormBridge.set(__scormBridge.KEYS.Score,100);
-      __scormBridge.save();
     }
     else{
       console.log("LMS not found");
@@ -151,6 +148,9 @@ var app = (function () {
     var direction = e.type;
     var nextPageId = __currentPageModel.pageId;
     if(direction == UIEvents.NEXT_PAGE){
+      if(__currentPageModel.pageStatus != "completed"){
+        __currentPageModel.pageStatus = "completed";
+      }
       nextPageId++;
     }
     else{
@@ -219,7 +219,6 @@ var app = (function () {
       EventManger.trigger(NavigationEvents.PAGE_LOAD_END, {
         pageModel: pageModel,xml:xmlNode
       });
-      EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED, {pageModel: pageModel});
       var audioFileName = $(xmlNode).find("audio").text();
       var audioType = $(xmlNode).find("audio").attr("type");
       if(audioFileName == undefined || audioFileName == ""){
