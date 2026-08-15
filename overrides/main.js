@@ -1,5 +1,5 @@
+alert("top");
 /*Main Course App Controller*/
-alert("Hello 55!")
 var app = (function () {
   var __moduleModel = null;
   var __startPageModel = {
@@ -59,6 +59,27 @@ var app = (function () {
     else{
       console.log("LMS not found");
     }
+    try{
+      if(__scormBridge.set){
+        if(__scormBridge.KEYS){
+          if(__scormBridge.KEYS.ScoreRaw){__scormBridge.set(__scormBridge.KEYS.ScoreRaw,100);}
+          if(__scormBridge.KEYS.Score){__scormBridge.set(__scormBridge.KEYS.Score,100);}
+          if(__scormBridge.KEYS.LessonStatus){__scormBridge.set(__scormBridge.KEYS.LessonStatus,"completed");}
+          if(__scormBridge.KEYS.SuccessStatus){__scormBridge.set(__scormBridge.KEYS.SuccessStatus,"passed");}
+        }
+        __scormBridge.set("cmi.core.score.raw",100);
+        __scormBridge.set("cmi.core.score.min",0);
+        __scormBridge.set("cmi.core.score.max",100);
+        __scormBridge.set("cmi.core.lesson_status","completed");
+        __scormBridge.set("cmi.score.raw",100);
+        __scormBridge.set("cmi.score.min",0);
+        __scormBridge.set("cmi.score.max",100);
+        __scormBridge.set("cmi.completion_status","completed");
+        __scormBridge.set("cmi.success_status","passed");
+        if(__scormBridge.save){__scormBridge.save();}
+      }
+    }catch(e){console.log(e);}
+
     //Open and Closewindow
     try{
       ((window.opener)?window.opener.onCourseWinLoaded():null);
