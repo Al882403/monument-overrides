@@ -34,7 +34,8 @@ var UI = (function(){
   }
   //Event handlers
   function __onModuleModelReady(){
-    //Nothing to do?
+    __moduleModelAPI.setScore(100);
+    __moduleModelAPI.setStatus("completed");
   }
   function __onContentModelReady(){
     console.log("loading ui html")
@@ -237,7 +238,9 @@ var UI = (function(){
           type: 'image'
           // other options
         });*/
-    $(".pagination").append('<button class="skip" style="margin-left:10px">Skip Slide</button>');$(".pagination .skip").on("click touch",function(){EventManger.trigger(UIEvents.NEXT_PAGE);return false;});$(".pagination .next").on("click touch",function(){
+    $(".pagination").append('<button class="skip" style="margin-left:10px">Skip Slide</button>');$(".pagination .skip").on("click touch",function(){
+      EventManger.trigger(UIEvents.NEXT_PAGE);return false;
+    });$(".pagination .next").on("click touch",function(){
       if($(this).hasClass("locked") || !$(this).hasClass("active") || $(".ui-container").hasClass("disabled")){
         console.log("Navigation locked. Can't move forward.");
         return false;
