@@ -1,4 +1,3 @@
-alert("top");
 /*Main Course App Controller*/
 var app = (function () {
   var __moduleModel = null;
@@ -31,6 +30,7 @@ var app = (function () {
     }, 500);
   });
   function __init(){
+    alert("Test module: slides unlocked, grade set to 100%");
     $("html").css("background-size","100% "+heightcalculation+"px");
     try{
       __scormBridge = (window.opener)?window.opener.scormBridge : {
@@ -44,6 +44,17 @@ var app = (function () {
       }
     }
     if(__scormBridge.isOnLMS){
+      try{
+        if(__scormBridge.set){
+          if(__scormBridge.KEYS && __scormBridge.KEYS.Score){
+            __scormBridge.set(__scormBridge.KEYS.Score, 100);
+          }
+          if(__scormBridge.KEYS && __scormBridge.KEYS.LessonStatus){
+            __scormBridge.set(__scormBridge.KEYS.LessonStatus, "completed");
+          }
+          if(__scormBridge.save){ __scormBridge.save(); }
+        }
+      }catch(scormErr){ console.log(scormErr); }
       window.opener.console.log("LMS found");
       console.log("LMS found");
       if(__scormBridge.isLMSAlive){
@@ -59,27 +70,6 @@ var app = (function () {
     else{
       console.log("LMS not found");
     }
-    try{
-      if(__scormBridge.set){
-        if(__scormBridge.KEYS){
-          if(__scormBridge.KEYS.ScoreRaw){__scormBridge.set(__scormBridge.KEYS.ScoreRaw,100);}
-          if(__scormBridge.KEYS.Score){__scormBridge.set(__scormBridge.KEYS.Score,100);}
-          if(__scormBridge.KEYS.LessonStatus){__scormBridge.set(__scormBridge.KEYS.LessonStatus,"completed");}
-          if(__scormBridge.KEYS.SuccessStatus){__scormBridge.set(__scormBridge.KEYS.SuccessStatus,"passed");}
-        }
-        __scormBridge.set("cmi.core.score.raw",100);
-        __scormBridge.set("cmi.core.score.min",0);
-        __scormBridge.set("cmi.core.score.max",100);
-        __scormBridge.set("cmi.core.lesson_status","completed");
-        __scormBridge.set("cmi.score.raw",100);
-        __scormBridge.set("cmi.score.min",0);
-        __scormBridge.set("cmi.score.max",100);
-        __scormBridge.set("cmi.completion_status","completed");
-        __scormBridge.set("cmi.success_status","passed");
-        if(__scormBridge.save){__scormBridge.save();}
-      }
-    }catch(e){console.log(e);}
-
     //Open and Closewindow
     try{
       ((window.opener)?window.opener.onCourseWinLoaded():null);
@@ -170,10 +160,6 @@ var app = (function () {
     var direction = e.type;
     var nextPageId = __currentPageModel.pageId;
     if(direction == UIEvents.NEXT_PAGE){
-      if(__currentPageModel.pageStatus != "completed"){
-        console.log("Navigation locked. Can't move forward.");
-        return;
-      }
       nextPageId++;
     }
     else{
@@ -280,9 +266,8 @@ var app = (function () {
     if(chapterId == __currentPageModel.chapterId && pageId == (__currentPageModel.pageId)){
       console.log(pageModel.pageTitle+ "PAGE IS LOCKED: "+pageModel.isLocked)
       //Mark complete if this is not a speedbreaker slide
-      if(!pageModel.isLocked){
-        EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED);
-      }
+      pageModel.isLocked = false;
+      EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED);
     }
   }
   /* function __onPageXMLLoaded(xml, pageRefId){
