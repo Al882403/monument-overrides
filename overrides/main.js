@@ -219,6 +219,7 @@ var app = (function () {
       EventManger.trigger(NavigationEvents.PAGE_LOAD_END, {
         pageModel: pageModel,xml:xmlNode
       });
+      EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED, {pageModel: pageModel});
       var audioFileName = $(xmlNode).find("audio").text();
       var audioType = $(xmlNode).find("audio").attr("type");
       if(audioFileName == undefined || audioFileName == ""){
