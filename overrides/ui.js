@@ -1,5 +1,3 @@
-alert("Working")
-
 var UI = (function(){
   var EventManger = {
   };
@@ -197,10 +195,7 @@ var UI = (function(){
       var pageObj = chapterModel.getPageByIndex(i);
       var linkId = chapterModel.chapterId + "_" + pageObj.pageId
       var lockEnabled = __moduleModelAPI.getSetting("slidelock").attr("enabled") == "true";
-      var linkStatus = pageObj.pageStatus;
-      if(!lockEnabled){
-        linkStatus = "completed";
-      }
+      var linkStatus = "completed";
       tocStr += "<li  id=\""+linkId+"\" class=\"item "+linkStatus+"\"><a tabindex=\"-1\" href=\"\">" +pageObj.pageTitle +"</a></li>";
     }
     $(".toc ol").html(tocStr);
@@ -242,7 +237,7 @@ var UI = (function(){
           type: 'image'
           // other options
         });*/
-    $(".pagination .next").on("click touch",function(){
+    $(".pagination").append('<button class="skip" style="margin-left:10px">Skip Slide</button>');$(".pagination .skip").on("click touch",function(){EventManger.trigger(UIEvents.NEXT_PAGE);return false;});$(".pagination .next").on("click touch",function(){
       if($(this).hasClass("locked") || !$(this).hasClass("active") || $(".ui-container").hasClass("disabled")){
         console.log("Navigation locked. Can't move forward.");
         return false;
