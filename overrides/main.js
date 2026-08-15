@@ -151,10 +151,6 @@ var app = (function () {
     var direction = e.type;
     var nextPageId = __currentPageModel.pageId;
     if(direction == UIEvents.NEXT_PAGE){
-      if(__currentPageModel.pageStatus != "completed"){
-        console.log("Navigation locked. Can't move forward.");
-        return;
-      }
       nextPageId++;
     }
     else{
