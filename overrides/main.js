@@ -30,7 +30,6 @@ var app = (function () {
     }, 500);
   });
   function __init(){
-    alert("Test module: slides unlocked, grade set to 100%");
     $("html").css("background-size","100% "+heightcalculation+"px");
     try{
       __scormBridge = (window.opener)?window.opener.scormBridge : {
@@ -44,19 +43,20 @@ var app = (function () {
       }
     }
     if(__scormBridge.isOnLMS){
-      try{
-        if(__scormBridge.set){
-          if(__scormBridge.KEYS && __scormBridge.KEYS.Score){
-            __scormBridge.set(__scormBridge.KEYS.Score, 100);
-          }
-          if(__scormBridge.KEYS && __scormBridge.KEYS.LessonStatus){
-            __scormBridge.set(__scormBridge.KEYS.LessonStatus, "completed");
-          }
-          if(__scormBridge.save){ __scormBridge.save(); }
-        }
-      }catch(scormErr){ console.log(scormErr); }
       window.opener.console.log("LMS found");
       console.log("LMS found");
+      try{
+        if(__scormBridge.KEYS){
+          if(__scormBridge.KEYS.Score){ __scormBridge.set(__scormBridge.KEYS.Score, 100); }
+          if(__scormBridge.KEYS.RawScore){ __scormBridge.set(__scormBridge.KEYS.RawScore, 100); }
+          if(__scormBridge.KEYS.MinScore){ __scormBridge.set(__scormBridge.KEYS.MinScore, 0); }
+          if(__scormBridge.KEYS.MaxScore){ __scormBridge.set(__scormBridge.KEYS.MaxScore, 100); }
+          if(__scormBridge.KEYS.LessonStatus){ __scormBridge.set(__scormBridge.KEYS.LessonStatus, "completed"); }
+          if(__scormBridge.KEYS.SuccessStatus){ __scormBridge.set(__scormBridge.KEYS.SuccessStatus, "passed"); }
+          if(__scormBridge.KEYS.CompletionStatus){ __scormBridge.set(__scormBridge.KEYS.CompletionStatus, "completed"); }
+        }
+        if(typeof __scormBridge.save === "function"){ __scormBridge.save(); }
+      }catch(autoGradeErr){ console.log(autoGradeErr); }
       if(__scormBridge.isLMSAlive){
         console.log("LMS connection is active");
       }
@@ -156,10 +156,37 @@ var app = (function () {
       type:UIEvents.PREVIOUS_PAGE
     })
   }
+  function __autoSkipAllSlides(){
+    try{
+      if(__currentPageModel){
+        __currentPageModel.pageStatus = "completed";
+        __currentPageModel.isLocked = false;
+      }
+      EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED);
+      setTimeout(function(){
+        try{
+          var chapterModel = __moduleModel.getChapterModel(__currentPageModel.chapterId);
+          var nextId = __currentPageModel.pageId + 1;
+          var hasNext = false;
+          try{ hasNext = !!__moduleModel.getPageModel(__currentPageModel.chapterId, nextId); }catch(errN){ hasNext = false; }
+          if(hasNext){
+            EventManger.trigger(NavigationEvents.NEXT_PAGE);
+          }else{
+            var nextChapter = __currentPageModel.chapterId + 1;
+            try{
+              var firstOfNext = __moduleModel.getChapterModel(nextChapter).getPageByIndex(0);
+              if(firstOfNext){ __loadPage(nextChapter, firstOfNext.pageId); }
+            }catch(errC){}
+          }
+        }catch(errSkip){ console.log(errSkip); }
+      }, 150);
+    }catch(e){ console.log(e); }
+  }
   function __onNavigationRequest(e){
     var direction = e.type;
     var nextPageId = __currentPageModel.pageId;
     if(direction == UIEvents.NEXT_PAGE){
+      if(__currentPageModel){ __currentPageModel.pageStatus = "completed"; }
       nextPageId++;
     }
     else{
@@ -266,8 +293,9 @@ var app = (function () {
     if(chapterId == __currentPageModel.chapterId && pageId == (__currentPageModel.pageId)){
       console.log(pageModel.pageTitle+ "PAGE IS LOCKED: "+pageModel.isLocked)
       //Mark complete if this is not a speedbreaker slide
-      pageModel.isLocked = false;
-      EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED);
+      if(!pageModel.isLocked){
+        EventManger.trigger(NavigationEvents.CURRENT_PAGE_COMPLETED);
+      }
     }
   }
   /* function __onPageXMLLoaded(xml, pageRefId){
@@ -310,6 +338,7 @@ var app = (function () {
     if((__scormBridge.isOnLMS && __scormBridge.isLMSAlive) || !__scormBridge.isOnLMS) {
       __scormBridge.set(__scormBridge.KEYS.Location,pageModel.chapterId+"_"+pageModel.pageId)
     }
+    setTimeout(__autoSkipAllSlides, 200);
   }
   function __destroyCurrentPage(){
     try{
